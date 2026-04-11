@@ -11,4 +11,19 @@ async function fetchRepos(searchQuery) {
   return response.data.items;
 }
 
-module.exports = { fetchRepos };
+async function fetchReadme(owner, repo) {
+  try {
+    const res = await octokit.repos.getReadme({
+      owner,
+      repo,
+    });
+
+    const content = Buffer.from(res.data.content, "base64").toString("utf-8");
+
+    return content;
+  } catch (err) {
+    return ""; // if README not found
+  }
+}
+
+module.exports = { fetchRepos, fetchReadme };
