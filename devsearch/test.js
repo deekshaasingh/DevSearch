@@ -1,25 +1,21 @@
 require("dotenv").config();
 
 const { connectDB } = require("./src/config/db");
-const { buildIndex } = require("./src/services/indexService");
+const { search } = require("./src/services/searchService");
 
 async function run() {
-  try {
-    // 🔥 CONNECT FIRST
-    await connectDB();
+  await connectDB();
 
-    console.log("🚀 Building index...");
+  console.log("🔍 Searching...");
 
-    const index = await buildIndex();
+  const results = await search("react");
 
-    console.log("React results:");
-    console.log(index["react"]);
+  console.log("Top results:");
+  results.slice(0, 5).forEach(repo => {
+    console.log(repo.name, "⭐", repo.stars);
+  });
 
-    process.exit(0);
-  } catch (err) {
-    console.error("❌ Error:", err.message);
-    process.exit(1);
-  }
+  process.exit();
 }
 
 run();
