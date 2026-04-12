@@ -3,45 +3,59 @@ const { buildIndex } = require("./indexService");
 const Repo = require("../models/Repo");
 
 async function search(query) {
-  // 🔹 1. convert query → tokens
   const words = processText(query);
 
-  // 🔹 2. build index
   const index = await buildIndex();
+  const repos = await Repo.find();
+
+  const totalDocs = repos.length;
 
   const scores = {}; // repoId → score
 
-  // 🔹 3. lookup each word
   for (const word of words) {
     const entries = index[word];
-
     if (!entries) continue;
 
+    const docsWithWord = entries.length;
+
+    // 🔥 IDF
+    const idf = Math.log(totalDocs / docsWithWord);
+
     for (const entry of entries) {
+      const repo = repos.find(r => r.repoId === entry.repoId);
+      if (!repo) continue;
+
+      // 🔥 TF
+      const tf = entry.freq / repo.tokens.length;
+
+      // 🔥 TF-IDF score
+      const score = tf * idf;
+
       if (!scores[entry.repoId]) {
         scores[entry.repoId] = 0;
       }
 
-      // 🔥 rank by frequency
-      scores[entry.repoId] += entry.freq;
+      scores[entry.repoId] += score;
     }
   }
 
-  // 🔹 4. sort repos by score
+  // 🔥 SORT
   const sortedRepoIds = Object.entries(scores)
-    .sort((a, b) => b[1] - a[1]) // descending
+    .sort((a, b) => b[1] - a[1])
     .map(entry => Number(entry[0]));
 
-  // 🔹 5. fetch repo details from DB
-  const repos = await Repo.find({
+  // 🔥 FETCH DATA
+  const resultRepos = await Repo.find({
     repoId: { $in: sortedRepoIds },
   });
 
-  // 🔹 6. maintain ranking order
+  // 🔥 MAINTAIN ORDER
   const repoMap = {};
-  repos.forEach(repo => {
+  resultRepos.forEach(repo => {
     repoMap[repo.repoId] = repo;
   });
+
+  
 
   const orderedResults = sortedRepoIds.map(id => repoMap[id]);
 
