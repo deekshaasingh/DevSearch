@@ -1,25 +1,23 @@
-require('dotenv').config();
+require("dotenv").config();
 
 const { connectDB } = require("./src/config/db");
-const { fetchAndStoreRepos } = require("./src/services/repoService");
+const { buildIndex } = require("./src/services/indexService");
 
 async function run() {
   try {
-    // 🔥 connect to MongoDB
+    // 🔥 CONNECT FIRST
     await connectDB();
 
-    console.log("🚀 Starting data pipeline...");
+    console.log("🚀 Building index...");
 
-    // 🔥 fetch + process + store repos
-    const count = await fetchAndStoreRepos("mern OR react OR nodejs");
+    const index = await buildIndex();
 
-    console.log(`✅ Stored ${count} repos`);
-
-    console.log("🎉 Pipeline completed successfully!");
+    console.log("React results:");
+    console.log(index["react"]);
 
     process.exit(0);
   } catch (err) {
-    console.error("❌ Error running pipeline:", err.message);
+    console.error("❌ Error:", err.message);
     process.exit(1);
   }
 }
