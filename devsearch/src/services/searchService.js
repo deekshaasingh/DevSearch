@@ -12,23 +12,26 @@ async function search(query) {
 
   const scores = {}; // repoId → score
 
+  // 🔥 FAST lookup map
+  const repoMap = {};
+  repos.forEach(repo => {
+    repoMap[repo.repoId] = repo;
+  });
+
   for (const word of words) {
     const entries = index[word];
     if (!entries) continue;
 
     const docsWithWord = entries.length;
 
-    // 🔥 IDF
-    const idf = Math.log(totalDocs / docsWithWord);
+    // 🔥 prevent divide-by-zero
+    const idf = Math.log((totalDocs + 1) / (docsWithWord + 1));
 
     for (const entry of entries) {
-      const repo = repos.find(r => r.repoId === entry.repoId);
+      const repo = repoMap[entry.repoId];
       if (!repo) continue;
 
-      // 🔥 TF
-      const tf = entry.freq / repo.tokens.length;
-
-      // 🔥 TF-IDF score
+      const tf = entry.freq / (repo.tokens.length || 1);
       const score = tf * idf;
 
       if (!scores[entry.repoId]) {
@@ -49,15 +52,13 @@ async function search(query) {
     repoId: { $in: sortedRepoIds },
   });
 
-  // 🔥 MAINTAIN ORDER
-  const repoMap = {};
+  // 🔥 maintain order
+  const resultMap = {};
   resultRepos.forEach(repo => {
-    repoMap[repo.repoId] = repo;
+    resultMap[repo.repoId] = repo;
   });
 
-  
-
-  const orderedResults = sortedRepoIds.map(id => repoMap[id]);
+  const orderedResults = sortedRepoIds.map(id => resultMap[id]);
 
   return orderedResults;
 }
