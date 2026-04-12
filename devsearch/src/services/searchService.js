@@ -1,30 +1,50 @@
 const { processText } = require("../utils/textCleaner");
-const { buildIndex } = require("./indexService");
+const { getIndex } = require("./indexService");
 const Repo = require("../models/Repo");
+const { log } = require("../utils/logger");
+
+// 🔥 cache repos too (important)
+let cachedRepos = null;
+
+async function getRepos() {
+  if (!cachedRepos) {
+    console.log("⚡ Caching repos...");
+    cachedRepos = await Repo.find();
+  }
+  return cachedRepos;
+}
 
 async function search(query) {
-  const words = processText(query);
+  log(`Search query: ${query}`);
 
-  const index = await buildIndex();
-  const repos = await Repo.find();
+  // 🔥 preprocess query (remove duplicate words)
+  const words = [...new Set(processText(query))];
+
+  if (words.length === 0) return [];
+
+  // 🔥 get cached data
+  const index = await getIndex();
+  const repos = await getRepos();
 
   const totalDocs = repos.length;
 
-  const scores = {}; // repoId → score
+  const scores = {};
 
-  // 🔥 FAST lookup map
+  // 🔥 fast lookup map
   const repoMap = {};
   repos.forEach(repo => {
     repoMap[repo.repoId] = repo;
   });
 
+  // 🔥 scoring loop
   for (const word of words) {
     const entries = index[word];
-    if (!entries) continue;
+
+    if (!entries || !Array.isArray(entries)) continue;
 
     const docsWithWord = entries.length;
 
-    // 🔥 prevent divide-by-zero
+    // 🔥 smooth IDF (avoids division issues)
     const idf = Math.log((totalDocs + 1) / (docsWithWord + 1));
 
     for (const entry of entries) {
@@ -38,27 +58,22 @@ async function search(query) {
         scores[entry.repoId] = 0;
       }
 
-      scores[entry.repoId] += score;
+      // 🔥 TF-IDF + popularity boost
+      scores[entry.repoId] += score + Math.log(repo.stars + 1);
     }
   }
 
-  // 🔥 SORT
+  // 🔥 sort repos by score
   const sortedRepoIds = Object.entries(scores)
     .sort((a, b) => b[1] - a[1])
     .map(entry => Number(entry[0]));
 
-  // 🔥 FETCH DATA
-  const resultRepos = await Repo.find({
-    repoId: { $in: sortedRepoIds },
-  });
+  if (sortedRepoIds.length === 0) return [];
 
-  // 🔥 maintain order
-  const resultMap = {};
-  resultRepos.forEach(repo => {
-    resultMap[repo.repoId] = repo;
-  });
-
-  const orderedResults = sortedRepoIds.map(id => resultMap[id]);
+  // 🔥 map results back
+  const orderedResults = sortedRepoIds
+    .map(id => repoMap[id])
+    .filter(Boolean);
 
   return orderedResults;
 }

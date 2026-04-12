@@ -9,12 +9,10 @@ const app = express();
 
 app.use(express.json());
 
-// 🔥 routes
 app.use("/search", searchRoutes);
 app.use("/repos", repoRoutes);
 app.use("/autocomplete", autocompleteRoutes);
 
-// 🔥 error handler (MUST BE LAST)
 app.use(errorHandler);
 
 module.exports = app;
