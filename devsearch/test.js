@@ -4,13 +4,24 @@ const { connectDB } = require("./src/config/db");
 const { fetchAndStoreRepos } = require("./src/services/repoService");
 
 async function run() {
-  await connectDB();
+  try {
+    // 🔥 connect to MongoDB
+    await connectDB();
 
-  const count = await fetchAndStoreRepos("mern OR react OR nodejs");
+    console.log("🚀 Starting data pipeline...");
 
-  console.log(`✅ Stored ${count} repos`);
+    // 🔥 fetch + process + store repos
+    const count = await fetchAndStoreRepos("mern OR react OR nodejs");
 
-  process.exit();
+    console.log(`✅ Stored ${count} repos`);
+
+    console.log("🎉 Pipeline completed successfully!");
+
+    process.exit(0);
+  } catch (err) {
+    console.error("❌ Error running pipeline:", err.message);
+    process.exit(1);
+  }
 }
 
 run();

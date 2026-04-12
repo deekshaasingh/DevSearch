@@ -22,13 +22,16 @@ async function fetchAndStoreRepos(query) {
         );
       }
 
-      // 🔥 combine all text for tokenization
+      // 🔥 combine all text
       const text =
         (repo.description || "") +
         " " +
         repo.name +
         " " +
         (readme || "");
+
+      // 🔥 generate tokens ONCE
+      const tokens = processText(text);
 
       // 🔥 filter bad repos
       if (
@@ -45,7 +48,7 @@ async function fetchAndStoreRepos(query) {
           url: repo.html_url,
           topics: repo.topics,
           owner: repo.owner.login,
-          tokens: processText(text), // includes README tokens
+          tokens: tokens, // ✅ use generated tokens
         });
       }
     } catch (err) {
@@ -54,7 +57,13 @@ async function fetchAndStoreRepos(query) {
   }
 
   // 🔥 store repos
-  await Repo.insertMany(cleaned, { ordered: false });
+  for (const repo of cleaned) {
+  await Repo.updateOne(
+    { repoId: repo.repoId },
+    repo,
+    { upsert: true }
+  );
+}
 
   return cleaned.length;
 }
