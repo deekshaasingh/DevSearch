@@ -47,7 +47,7 @@ function getSuggestionsFromTrie(prefix, trie) {
 
   dfs(node, prefix);
 
-  return results;
+  return Array.from(new Set(results));
 }
 
 async function getSuggestions(prefix) {

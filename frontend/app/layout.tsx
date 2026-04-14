@@ -40,8 +40,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${outfit.variable} ${playfair.variable} ${dmMono.variable}`}>
-      <body>
+    <html lang="en" data-scroll-behavior="smooth" className={`${outfit.variable} ${playfair.variable} ${dmMono.variable}`}>
+      <body suppressHydrationWarning={true}>
         <CustomCursor />
         <AmbientBackground />
         <Navbar />

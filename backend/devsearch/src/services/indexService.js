@@ -14,7 +14,9 @@ async function buildIndex() {
   // ✅ check INSIDE loop
   if (!Array.isArray(repo.tokens)) continue;
 
-  repo.tokens.forEach(word => {
+  const uniqueTokens = [...new Set(repo.tokens)];
+
+uniqueTokens.forEach(word => {
     if (!word || typeof word !== "string") return;
 
     word = word.toLowerCase();

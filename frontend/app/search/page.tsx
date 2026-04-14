@@ -178,7 +178,8 @@ function SearchContent() {
           <>
             <div>
               {pageItems.map((r, i) => (
-                <RepoCard key={r.name ?? i} repo={r} delay={i * 50} />
+                <RepoCard key={`${r.url}-${i}`}
+                repo={r} delay={i * 50} />
               ))}
             </div>
             <Pagination current={currentPage} total={totalPages} onPage={handlePageChange} />

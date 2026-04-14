@@ -67,8 +67,7 @@ export function useSearch() {
       setCurrentPage(1);
 
       try {
-        const data = await searchRepos(query);
-        const results = data.results || [];
+        const results = await searchRepos(query);
         setAllResults(results);
         applyFiltersAndSort(results, langs, minStars, sortBy);
       } catch {

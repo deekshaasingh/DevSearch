@@ -12,7 +12,10 @@ export default function RepoCard({ repo, delay = 0 }: RepoCardProps) {
   const stars = (repo.stars || 0).toLocaleString();
   const lang = repo.language || '';
   const url = repo.url || '#';
-  const topics = (repo.topics || []).slice(0, 4);
+
+  // ✅ REMOVE DUPLICATES AT SOURCE
+  const topics = Array.from(new Set(repo.topics || [])).slice(0, 4);
+
   const langColor = LANG_COLORS[lang] || '#524D6B';
 
   return (
@@ -33,6 +36,7 @@ export default function RepoCard({ repo, delay = 0 }: RepoCardProps) {
             {name}
           </div>
         </div>
+
         <div className="card-stars">
           <svg viewBox="0 0 24 24" fill="currentColor">
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
@@ -54,8 +58,8 @@ export default function RepoCard({ repo, delay = 0 }: RepoCardProps) {
 
       {topics.length > 0 && (
         <div className="card-topics">
-          {topics.map((t) => (
-            <span key={t} className="topic-pill">
+          {topics.map((t, index) => (
+            <span key={`${t}-${index}`} className="topic-pill">
               {t}
             </span>
           ))}
