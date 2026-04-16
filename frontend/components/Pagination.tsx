@@ -10,16 +10,34 @@ export default function Pagination({ current, total, onPage }: PaginationProps) 
   if (total <= 1) return null;
 
   const pages: (number | '…')[] = [];
-  for (let i = 1; i <= total; i++) {
-    if (i === 1 || i === total || Math.abs(i - current) <= 1) {
-      pages.push(i);
-    } else if (Math.abs(i - current) === 2) {
-      pages.push('…');
-    }
+
+  const range = 2; // 🔥 show ±2 pages
+
+  const start = Math.max(2, current - range);
+  const end = Math.min(total - 1, current + range);
+
+  // Always include first page
+  pages.push(1);
+
+  // Left ellipsis
+  if (start > 2) {
+    pages.push('…');
   }
 
-  // Deduplicate ellipses
-  const deduped = pages.filter((p, i) => !(p === '…' && pages[i - 1] === '…'));
+  // Middle pages
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+
+  // Right ellipsis
+  if (end < total - 1) {
+    pages.push('…');
+  }
+
+  // Always include last page (if more than 1)
+  if (total > 1) {
+    pages.push(total);
+  }
 
   return (
     <div className="pagination">
@@ -31,7 +49,7 @@ export default function Pagination({ current, total, onPage }: PaginationProps) 
         ‹
       </button>
 
-      {deduped.map((p, i) =>
+      {pages.map((p, i) =>
         p === '…' ? (
           <button key={`ellipsis-${i}`} className="pg-btn" disabled>
             …

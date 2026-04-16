@@ -106,7 +106,7 @@ a {
   background: var(--p300);
   border-radius: 50%;
   pointer-events: none;
-  z-index: 9999;
+  z-index: 999999;
   transform: translate(-50%, -50%);
   transition: transform 0.08s, width 0.2s var(--ease), height 0.2s var(--ease), opacity 0.2s;
 }

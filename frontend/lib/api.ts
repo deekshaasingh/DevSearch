@@ -35,7 +35,7 @@ export const LANG_COLORS: Record<string, string> = {
 export const KNOWN_LANGS = ['javascript', 'python', 'typescript', 'go', 'rust', 'ruby'];
 
 export async function searchRepos(query: string) {
-  const res = await fetch(`${API_BASE}/search?q=${query}`);
+  const res = await fetch(`${API_BASE}/search?q=${query}&limit=50`);
   const data = await res.json();
   return data.results || [];
 }

@@ -40,13 +40,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" data-scroll-behavior="smooth" className={`${outfit.variable} ${playfair.variable} ${dmMono.variable}`}>
-      <body suppressHydrationWarning={true}>
-        <CustomCursor />
-        <AmbientBackground />
-        <Navbar />
-        <div className="page-wrapper">{children}</div>
-      </body>
-    </html>
+    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
+  <body className={`${outfit.variable} ${playfair.variable}`}>
+  <CustomCursor />   {/* ADD THIS */}
+  <AmbientBackground />  {/* optional but recommended */}
+  {children}
+</body>
+</html>
   );
 }
+
+

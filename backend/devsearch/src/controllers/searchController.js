@@ -9,7 +9,7 @@ async function searchController(req, res, next) {
     }
 
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = parseInt(req.query.limit) || 50;
 
     const results = await search(q);
 
