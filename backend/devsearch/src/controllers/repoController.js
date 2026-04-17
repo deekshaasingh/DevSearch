@@ -10,4 +10,16 @@ async function getRepos(req, res, next) {
   }
 }
 
-module.exports = { getRepos };
+async function getRepoStats(req, res) {
+  try {
+    const total = await Repo.countDocuments();
+
+    res.json({
+      totalRepos: total,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch stats" });
+  }
+}
+
+module.exports = { getRepos, getRepoStats };

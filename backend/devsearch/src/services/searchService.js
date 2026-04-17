@@ -21,6 +21,11 @@ async function search(query) {
   if (words.length === 0) return [];
 
   const index = await getIndex();
+
+  if (!index) {
+    console.log("⚠️ Index not ready");
+    return [];
+  }
   const repos = await getRepos();
 
   const totalDocs = repos.length;

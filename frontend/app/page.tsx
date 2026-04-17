@@ -4,7 +4,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import RepoCard from '@/components/RepoCard';
 import { EmptyState, ErrorState, LoadingBlock } from '@/components/StateBlocks';
-import { searchRepos, fetchAutocomplete, API_BASE } from '@/lib/api';
+import { searchRepos, fetchAutocomplete, API_BASE , fetchRepoStats} from '@/lib/api';
 
 // ✅ TEMP FIX (avoids TS error if path issue exists)
 type Repo = any;
@@ -18,6 +18,7 @@ export default function HomePage() {
   const [previewRepos, setPreviewRepos] = useState<Repo[] | null>(null);
   const [previewError, setPreviewError] = useState(false);
   const [repoCount, setRepoCount] = useState<string>('—');
+  const [totalRepos, setTotalRepos] = useState(0);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -35,6 +36,10 @@ export default function HomePage() {
     }
     load();
   }, []);
+
+  useEffect(() => {
+  fetchRepoStats().then(setTotalRepos);
+}, []);
 
   // ✅ Autocomplete
   const handleInput = useCallback((val: string) => {
@@ -195,7 +200,7 @@ export default function HomePage() {
       {/* Stats */}
       <div className="stats-ribbon">
         <div className="stat-block">
-          <div className="stat-num">{repoCount}</div>
+          <div className="stat-num">{totalRepos}+</div>
           <div className="stat-label">Repositories</div>
         </div>
 

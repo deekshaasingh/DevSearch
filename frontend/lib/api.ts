@@ -35,7 +35,7 @@ export const LANG_COLORS: Record<string, string> = {
 export const KNOWN_LANGS = ['javascript', 'python', 'typescript', 'go', 'rust', 'ruby'];
 
 export async function searchRepos(query: string) {
-  const res = await fetch(`${API_BASE}/search?q=${query}&limit=50`);
+  const res = await fetch(`${API_BASE}/search?q=${query}&limit=100`);
   const data = await res.json();
   return data.results || [];
 }
@@ -54,4 +54,10 @@ export async function fetchAutocomplete(q: string) {
 
   const data = await res.json();
   return data.suggestions || [];
+}
+
+export async function fetchRepoStats() {
+  const res = await fetch(`${API_BASE}/repos/stats`);
+  const data = await res.json();
+  return data.totalRepos;
 }
