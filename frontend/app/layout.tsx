@@ -31,7 +31,7 @@ const dmMono = DM_Mono({
 export const metadata: Metadata = {
   title: 'DevSearch — Discover GitHub Repositories',
   description:
-    'Semantic search across thousands of GitHub repositories. Natural language queries. Intelligent TF-IDF ranking.',
+    'Semantic search across thousands of GitHub repositories. Natural language queries. Intelligent TF-IDF ranking.'
 };
 
 export default function RootLayout({

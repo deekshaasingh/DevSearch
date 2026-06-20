@@ -20,6 +20,7 @@ export default function HomePage() {
   const [repoCount, setRepoCount] = useState<string>('—');
   const [totalRepos, setTotalRepos] = useState(0);
 
+
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -245,7 +246,7 @@ export default function HomePage() {
             <EmptyState title="No repositories found." body="Run the crawler to index some repos." />
           ) : (
             previewRepos.map((r, i) => (
-              <RepoCard key={r.name ?? i} repo={r} delay={i * 60} />
+              <RepoCard key={r.name ?? i} repo={r} delay={i * 60} query={query} />
             ))
           )}
         </div>
