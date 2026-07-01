@@ -1,11 +1,11 @@
 const { octokit } = require("../config/github");
 
-async function fetchRepos(searchQuery) {
+async function fetchRepos(searchQuery, perPage = 50) {
   const response = await octokit.search.repos({
     q: searchQuery,
     sort: "stars",
     order: "desc",
-    per_page: 50,
+    per_page: perPage,
   });
 
   return response.data.items;
